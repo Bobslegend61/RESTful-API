@@ -35,15 +35,58 @@ let server = http.createServer((req, res) => {
     req.on('end', () => {
         buffer += decoder.end();
 
-        
-        // Send the response
-        res.end('Hello world\n');
+        // Choose handle which request should go to, if one is not found, default to notFound handler
+        let choosenHandler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : handlers.notFound;
+
+        // Construct data object to send to the handler
+        let data = {
+            trimmedPath,
+            queryStringObject,
+            method,
+            headers,
+            'payload': buffer
+        };
+
+        // Route the requset to the handler specified in the router
+        choosenHandler(data, (statusCode, payload) => {
+            // Use the status code called back by the handle or default to a 200
+            statusCode = typeof(statusCode) == 'number' ? statusCode : 200;
+
+            // Use the payload called back by the handler or default to an empty object
+            payload = typeof(payload) == 'object' ? payload : {};
+
+            // Convert the payload to a string
+            let payloadString = JSON.stringify(payload);
+
+            // return response
+            res.writeHead(statusCode);
+            res.end(payloadString);
+            // Log the request path
+            console.log(`Returning this response: ${ statusCode }, ${ payload }`);
+        }); 
     
-        // Log the request path
-        console.log(`Request is recieved with this payload: ${ JSON.stringify(buffer) }`);
     });
 
 });
 
 // Start the server, and have it listen on port 3000
 server.listen(3000, () => console.log('The server is listening on port 3000'));
+
+// Define handlers
+let handlers = {};
+
+// sample handler
+handlers.sample = (data, callback) => {
+    // callback a http status code and a payload object
+    callback(406, { 'name': 'sample handler' });
+}
+
+// not found handler
+handlers.notFound = (data, callback) => {
+    callback(404);
+}
+
+// Define a request router
+let router = {
+    'sample': handlers.sample
+};

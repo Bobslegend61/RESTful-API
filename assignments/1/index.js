@@ -4,18 +4,27 @@
  */
 
 const http = require(`http`);
+const https = require('https');
+const fs = require('fs');
 
 
 const config = require(`./config`);
 const unifiedFunc = require(`./unifiedfunc`);
 
 // Create http Server
-const server = http.createServer((req, res) => {
-    unifiedFunc(req, res);
-});
+const httpServer = http.createServer((req, res) => unifiedFunc(req, res));
 
 // Create https server
+const serverConfig = {
+    key: fs.readFileSync('./https/key.pem'),
+    cert: fs.readFileSync('./https/cert.pem')
+};
+const httpsServer = https.createServer(serverConfig, (req, res) => unifiedFunc(req, res));
 
-// Port
+// http Port
 const { httpPort } = config;
-server.listen(httpPort, () => console.log(`App listening on port: ${ httpPort }`));
+httpServer.listen(httpPort, () => console.log(`App listening on port: ${ httpPort }`));
+
+// https port
+const { httpsPort } = config;
+httpsServer.listen(httpsPort, () => console.log(`App listening on port: ${ httpsPort }`))

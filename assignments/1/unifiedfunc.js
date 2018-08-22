@@ -1,6 +1,8 @@
 const url = require(`url`);
 const StringDecoder = require('string_decoder').StringDecoder;
 
+const router = require('./router/routers');
+
 
 module.exports = (req, res) => {
     // Parse url
@@ -37,9 +39,16 @@ module.exports = (req, res) => {
             payload: buffer
         }
 
+        // select Handler
+        const selectHandler = trimmedPathname in router ? router[trimmedPathname] : router.notFound;
+        
+        // call handler
+        selectHandler(requestData, (statusCode, payload) => {
+            payload = (payload && typeof(payload) == 'object') ? payload : {};
 
-        res.setHeader(`Content-Type`, `application/json`);
-        res.writeHead(200);   
-        res.end(buffer); 
+            res.setHeader(`Content-Type`, `application/json`);
+            res.writeHead(statusCode);   
+            res.end(JSON.stringify(payload));
+        });
     });
 }

@@ -3,9 +3,9 @@
  */
 const path = require('path');
 
-const { create, update } = require('./helpers');
+const { create, update, read, delete: helpersDelete } = require('./helpers');
 
-const users = (() => {
+module.exports = (() => {
     const baseDir = path.join(__dirname, '/../.data/users/');
 
     /**
@@ -30,8 +30,30 @@ const users = (() => {
         update(baseDir+fileName, '.json', data, callback);
     };
 
+    /**
+     * Get a user from the file system
+     *
+     * @param { string } fileName - Name of the user file to get.
+     * @param { Object } callback - function to return error if any or data.
+     */
+    const getUser = (fileName, callback) => {
+        read(baseDir+fileName, '.json', callback);
+    };
+
+    /**
+     * Delete a user from the file system
+     *
+     * @param { string } fileName - Name of the user file to delete.
+     * @param { Object } callback - function to return error if any.
+     */
+    const deleteUser = (fileName, callback) => {
+        helpersDelete(baseDir+fileName, '.json', callback);
+    };
+
     return {
         createUser,
-        updateUser
+        updateUser,
+        getUser,
+        deleteUser
     }
 })();

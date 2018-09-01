@@ -3,6 +3,7 @@
  */
 
 const fs = require('fs');
+const crypto = require('crypto');
 
 const helpers = {};
 
@@ -14,11 +15,142 @@ const helpers = {};
  */
 helpers.parseToJson = (str) => {
     try {
-        let parsedStr = JSON.parse(str);
+        const parsedStr = JSON.parse(str);
         return parsedStr;
     }catch(err) {
         return {};
     }
+};
+
+/**
+ * Check if password is correct.
+ *
+ * @param { string } password - password.
+ * @param { string } confirmPassword - compared password.
+ * @returns Boolean.
+ */
+helpers.confirmPassword = (password, confirmPassword) => {
+    return password === confirmPassword ? true : false;
+};
+
+/**
+ * Function to check if a value is not a string and also invalidate the length
+ *
+ * @param { any } data - Value to check.
+ * @param { number } len - Desired length.
+ * @returns Boolean 
+ */
+helpers.checkIfNotStringAndLength = (data, len) => {
+    return typeof(data) !== 'string' || data.trim().length <= len ? true : false;
+};
+
+/**
+ * Hash a password.
+ *
+ * @param { string } password - Plain password to be hashed.
+ * @returns The hashed password.
+ */
+helpers.hashPassword = (password) => {
+    let hash = crypto.createHash('sha256');
+    hash.update(password);
+    return hash.digest('hex');
+};
+
+helpers.generateId = (len) => {
+    let str = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let id = '';
+    for(let i = 0; i <= len; i++) {
+        id+= str[Math.floor(Math.random() * (str.length - 1))];
+    }
+    return id;
+};
+
+/**
+ * Function to validate user info
+ *
+ * @param { Object } payload - Object containing user info
+ * @returns Boolean
+ */
+helpers.validatePayload = (payload) => {
+    if(typeof(payload) !== 'object') return false;
+    let isValid = true;
+    const keys = Object.keys(payload);
+
+    for(let key of keys) {
+   
+        switch(key) {
+            case 'name': 
+                if(helpers.checkIfNotStringAndLength(payload[key], 0)) {
+                    isValid = false;
+                }
+                break;
+            case 'email':
+                let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                if(helpers.checkIfNotStringAndLength(payload[key], 0) || re.test(payload[key]) !== true) {
+                    isValid = false;
+                }
+                break;
+            case 'password': 
+                if(helpers.checkIfNotStringAndLength(payload[key], 5)) {
+                    isValid = false;
+                }
+                break;
+            case 'confirmPassword':
+                if(helpers.checkIfNotStringAndLength(payload[key], 5)) {
+                    isValid = false;
+                }
+                break;
+            case 'address':
+                if(typeof(payload[key]) !== 'object' || Object.keys(payload[key]).length !== 5
+                ) {
+                    isValid = false;
+                }else {
+                    for(let subKey of Object.keys(payload[key])) {
+                        
+                        switch(subKey) {
+                            case 'country':
+                                if(helpers.checkIfNotStringAndLength(payload[key][subKey], 0)) {
+                                    isValid = false;
+                                }
+                                break;
+                            case 'state':
+                                if(helpers.checkIfNotStringAndLength(payload[key][subKey], 0)) {
+                                    isValid = false;
+                                }
+                                break;
+                            case 'city':
+                                if(helpers.checkIfNotStringAndLength(payload[key][subKey], 0)) {
+                                    isValid = false;
+                                }
+                                break;
+                            case 'street': 
+                                if(helpers.checkIfNotStringAndLength(payload[key][subKey], 0)) {
+                                    isValid = false;
+                                }
+                                break;
+                            case 'no':
+                                if(typeof(payload[key][subKey]) !== 'number') {
+                                    isValid = false;
+                                }
+                                break;
+                            default:
+                                isValid = false;
+                        };
+                        if(!isValid) {
+                            break;
+                        }
+                    };
+                };
+                break;
+            default: 
+                isValid = false;
+        };
+        if(!isValid) {
+            break;
+        }
+    };
+    
+    return isValid;
 };
 
 /**

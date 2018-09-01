@@ -26,7 +26,7 @@ module.exports = (() => {
 
         httpServer.listen(httpPort, () => console.log('\x1b[36m%s\x1b[0m', `The HTTP server is listening on port: ${ httpPort } and environment: ${ envName }`));
 
-        httpsServer.listen(httpsPort, () => console.log('\x1b[35m%s\x1b[0m', `The HTTPS server is listening on port: ${ httpPort } and environment: ${ envName }`));
+        httpsServer.listen(httpsPort, () => console.log('\x1b[35m%s\x1b[0m', `The HTTPS server is listening on port: ${ httpsPort } and environment: ${ envName }`));
     }
 
     return {

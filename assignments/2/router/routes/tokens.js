@@ -14,7 +14,9 @@ module.exports = (() => {
 
         const tokenData = JSON.stringify({ id, token, expiresIn, email, userId });
         create(id, tokenData, err => {
-            callback(err, tokenData);
+            let parsedTokenData = _helpers.parseToJson(tokenData);
+            delete parsedTokenData.expiresIn;
+            callback(err, parsedTokenData);
         });
     };
 

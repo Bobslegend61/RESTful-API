@@ -9,7 +9,7 @@ module.exports = (() => {
     const baseDir = path.join(__dirname, '/../.data/users/');
 
     /**
-     * Creates a user in the file syatem
+     * Creates a user in the file system
      *
      * @param { string } fileName - Name of the file to store the user.
      * @param { string } data - Details of the user.

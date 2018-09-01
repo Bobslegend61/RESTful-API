@@ -2,9 +2,10 @@
  * Router Config setup
  */
 
-const { users, notFound } = require('./handlers');
+const { users, notFound, login } = require('./handlers');
 
 module.exports = {
     users,
-    notFound
+    notFound,
+    login
 };

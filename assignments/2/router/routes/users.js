@@ -100,9 +100,7 @@ module.exports = (() => {
                 break;
         };
         
-        method(data, (statusCode, payload) => {
-            callback(statusCode, payload);
-        });
+        method(data, callback);
     };
 
     return users;

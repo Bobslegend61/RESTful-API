@@ -3,7 +3,7 @@
  */
 
 const _helpers = require('../../lib/helpers');
-const { createFile, getFile, updateFile } = require('../../lib/fs');
+const { createFile, getFile, updateFile, deleteFile, readFile } = require('../../lib/fs');
 
 module.exports = (() => {
 
@@ -131,8 +131,32 @@ module.exports = (() => {
      * @param { Object } data - All information needed to handle the request
      * @param { Object } callback - Response from the request (statusCode, payload)
      */
-    const deleteUser = (data, callback) => {
-        
+    const deleteUser = ({ headers: { id, token }, payload: { email, userId } }, callback) => {
+        if(_helpers.checkIfNotStringAndLength(id, 20) || _helpers.checkIfNotStringAndLength(token, 51)) return callback(401);
+
+        getFile('.data/tokens', id, (err, { token: t, expiresIn, email: e, userId: tuid }) => {
+            if(err) return callback(401);
+            if(token !== t || Date.now() > expiresIn) return callback(403);
+            if(!_helpers.validatePayload({ email })) return callback(400, { msg: 'Invalid Credentials' });
+            if(email !== e || userId !== tuid) return callback(403);
+
+            readFile('.data/tokens', (err, files) => {
+                if(err) return callback(500);
+                let isNotError = true;
+                files.forEach(file => {
+                    deleteFile('.data/tokens', file.replace('.json', ''), err => {
+                        if(err) isNotError = false;
+                    });
+                });
+                if(!isNotError) return callback(500);
+
+                deleteFile('.data/users', email, err => {
+                    if(err) return callback(500);
+
+                    callback(200);
+                });
+            });
+        });
     }
 
     /**

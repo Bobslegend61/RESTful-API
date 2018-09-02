@@ -285,8 +285,12 @@ helpers.append = (path, ext, data, callback) => {
     });
 };
 
-helpers.list = () => {
+helpers.list = (dir, callback) => {
+    fs.readdir(dir, (err, files) => {
+        if(err) return callback('Error reading files');
 
+        callback(false, files);
+    });
 };
 
 module.exports = helpers;

@@ -3,7 +3,7 @@
  */
 const path = require('path');
 
-const { create, update, read, delete: helpersDelete } = require('./helpers');
+const { create, update, read, delete: helpersDelete, list } = require('./helpers');
 
 module.exports = (() => {
     const baseDir = path.join(__dirname, '/../');
@@ -54,10 +54,15 @@ module.exports = (() => {
         helpersDelete(`${ baseDir }${ folder }/${ fileName }`, ext, callback);
     };
 
+    const readFile = (folder, callback) => {
+        list(`${ baseDir }${ folder }`,  callback);
+    };
+
     return {
         createFile,
         updateFile,
         getFile,
-        deleteFile
+        deleteFile,
+        readFile
     }
 })();

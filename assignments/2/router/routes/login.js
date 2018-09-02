@@ -2,15 +2,22 @@
  * Login Route
  */
 const _helpers = require('../../lib/helpers');
-const { getUser } = require('../../lib/users');
+const { getFile } = require('../../lib/fs');
 const tokens = require('./tokens');
 
 module.exports = (() => {
 
+    /**
+     * Login route
+     *
+     * @param { Object } { payload, method } - Login credentials
+     * @param { Object } callback Function to call to send response.
+     * @returns - Response
+     */
     const post = ({ payload, method }, callback) => {
         if(!_helpers.validatePayload(payload)) return callback(400, { msg: 'Invalid Credentials' });
 
-        getUser(payload.email, (err, { password, email, userId }) => {
+        getFile('.data/users', payload.email, (err, { password, email, userId }) => {
             if(err) return callback(400, { msg: 'User not found' });
             let hashedPwd = _helpers.hashPassword(payload.password);
             if(!_helpers.confirmPassword(password, hashedPwd)) return callback(400, { msg: 'Email/Password incorrect' });

@@ -3,7 +3,7 @@
  */
 
 const _helpers = require('../../lib/helpers');
-const { create } = require('../../lib/tokens'); 
+const { createFile } = require('../../lib/fs');
 
 module.exports = (() => {
 
@@ -13,7 +13,7 @@ module.exports = (() => {
         const expiresIn = Date.now() + (1000 * 60 * 60 );
 
         const tokenData = JSON.stringify({ id, token, expiresIn, email, userId });
-        create(id, tokenData, err => {
+        createFile('.data/tokens', id, tokenData, err => {
             let parsedTokenData = _helpers.parseToJson(tokenData);
             delete parsedTokenData.expiresIn;
             callback(err, parsedTokenData);
@@ -27,7 +27,8 @@ module.exports = (() => {
      * @param { string } { email, userId, method } - Parameters needed for this route.
      * @param { Object } callback - Function to call if resolved.
      */
-    const tokens = ({ email, userId, method }, callback) => {
+    const tokens = (data, callback) => {
+        let { method } = data;
         switch(method) {
             case 'post':
                 method = post;
@@ -45,7 +46,7 @@ module.exports = (() => {
                 method = deleteToken;
                 break;
         };
-        method({ email, userId }, callback);
+        method(data, callback);
     };
 
     return tokens;

@@ -55,7 +55,7 @@ module.exports = (() => {
                         headers,
                         payload: _helpers.parseToJson(buffer)
                     }
-            
+                    console.log(reqObject);
                     choosenRouter(reqObject, (statusCode, payload) => {
                         let { statusCode: s, payload: p } = _helpers.checkStatusCodeAndPayload(statusCode, payload);
             

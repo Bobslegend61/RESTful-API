@@ -77,7 +77,7 @@ module.exports = (() => {
      * @param { Object } data - All information needed to handle the request
      * @param { Object } callback - Response from the request (statusCode, payload)
      */
-    const put = ({ headers: { id, token } , payload }, callback) => {
+    const put = ({ headers: { id, token }, payload }, callback) => {
         if(_helpers.checkIfNotStringAndLength(id, 20) || _helpers.checkIfNotStringAndLength(token, 51)) return callback(401);
 
         getFile('.data/tokens', id, (err, originalToken) => {
@@ -85,11 +85,11 @@ module.exports = (() => {
             if(token !== originalToken.token || Date.now() > originalToken.expiresIn) return callback(403);
 
 
-            if(!_helpers.validatePayload(payload)) return callback(400, { msg: 'Invalid Credentials' });
-            if(!payload.email) return callback(400, { msg: 'Invalid Credentials' });
+            if(!_helpers.validatePayload(payload)) return callback(400, { msg: 'Invalid Credentials1' });
+            if(!payload.email) return callback(400, { msg: 'Invalid Credentials4' });
             if(payload.password) {
-                if(!payload.confirmPassword) return callback(400, { msg: 'Invalid Credentials' });
-                if(!_helpers.confirmPassword(payload.password, payload.confirmPassword)) return callback(400, { msg: 'Invalid Credentials' });
+                if(!payload.confirmPassword) return callback(400, { msg: 'Invalid Credentials2' });
+                if(!_helpers.confirmPassword(payload.password, payload.confirmPassword)) return callback(400, { msg: 'Invalid Credentials3' });
     
                 delete payload.confirmPassword;
                 payload.password = _helpers.hashPassword(payload.password);
@@ -184,7 +184,6 @@ module.exports = (() => {
                 method = deleteUser;
                 break;
         };
-        
         method(data, callback);
     };
 

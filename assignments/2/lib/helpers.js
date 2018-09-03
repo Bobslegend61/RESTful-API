@@ -189,7 +189,7 @@ helpers.checkMethod = (method, callback) => {
  */
 helpers.create = (path, ext, data, callback) => {
     fs.open(path+ext, 'wx', (err, fileDescriptor) => {
-        if(err) return callback('Error opening file for writing');
+        if(err || !fileDescriptor) return callback('Error opening file for writing');
 
         fs.writeFile(fileDescriptor, data, err => {
             if(err) return callback('Error writing file');
@@ -212,7 +212,7 @@ helpers.create = (path, ext, data, callback) => {
  */
 helpers.read = (path, ext, callback) => {
     fs.readFile(path+ext, 'utf8', (err, data) => {
-        if(err) return callback('Error reading file');
+        if(err || !data) return callback('Error reading file');
 
         return callback(false, JSON.parse(data));
     });
@@ -228,7 +228,7 @@ helpers.read = (path, ext, callback) => {
  */
 helpers.update = (path, ext, data, callback) => {
     fs.open(path+ext, 'r+', (err, fileDescriptor) => {
-        if(err) return callback('Error opening file for updating');
+        if(err || !fileDescriptor) return callback('Error opening file for updating');
 
         fs.truncate(fileDescriptor, err => {
             if(err) return callback('Error truncating file for updating');
@@ -271,7 +271,7 @@ helpers.delete = (path, ext, callback) => {
  */
 helpers.append = (path, ext, data, callback) => {
     fs.open(path+ext, 'a', (err, fileDescriptor) => {
-        if(err) return callback('Error opening file for appending');
+        if(err || !fileDescriptor) return callback('Error opening file for appending');
 
         fs.appendFile(fileDescriptor, data+'\n', err => {
             if(err) return callback('Error appending file');
@@ -287,7 +287,7 @@ helpers.append = (path, ext, data, callback) => {
 
 helpers.list = (dir, callback) => {
     fs.readdir(dir, (err, files) => {
-        if(err) return callback('Error reading files');
+        if(err || !files) return callback('Error reading files');
 
         callback(false, files);
     });
